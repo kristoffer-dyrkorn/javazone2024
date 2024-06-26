@@ -90,7 +90,7 @@ const config = JSON.parse(fs.readFileSync(process.argv[2]), "utf8");
 const latLonBBox = getLatLonBBox(config["bbox"], config["project_srid"]);
 const urlParam = `data=[out:json];way["highway"](${latLonBBox[1]},${latLonBBox[0]},${latLonBBox[3]},${latLonBBox[2]});out geom;`;
 
-const url = config["road_url"] + "?" + urlParam;
+const url = config["osm_url"] + "?" + urlParam;
 
 console.log("Requesting: ", url);
 
