@@ -10,6 +10,9 @@ const zoomScale = [
   2361.1886160711315, 1180.5943080355657, 590.2971540177829,
 ];
 
+// zoom level to use when getting tiles
+const zoom = 15;
+
 // tile image size, in pixels
 const tileSize = 256;
 
@@ -58,10 +61,8 @@ function getBBox(tiles, zoom) {
 function getCropValues(tiles, zoom) {
   const tileCountX = tiles[2] - tiles[0] + 1;
   const tileCountY = tiles[3] - tiles[1] + 1;
-  console.log("Tile count:", tileCountX * tileCountY);
 
   const textureSize = [tileCountX * tileSize, tileCountY * tileSize];
-  console.log("Size of stiched image", textureSize);
 
   const textureBBox = getBBox(tiles, zoom);
 
@@ -74,8 +75,8 @@ function getCropValues(tiles, zoom) {
   const bottomCrop = (bbox[1] - textureBBox[1]) * yRes;
   const topCrop = (textureBBox[3] - bbox[3]) * yRes;
 
-  const newWidth = textureSize[0] - leftCrop - rightCrop;
-  const newHeight = textureSize[1] - bottomCrop - topCrop;
+  const newWidth = Math.round(textureSize[0] - leftCrop - rightCrop);
+  const newHeight = Math.round(textureSize[1] - bottomCrop - topCrop);
 
   return [leftCrop, topCrop, newWidth, newHeight];
 }
@@ -86,8 +87,6 @@ if (process.argv.length != 3) {
 }
 
 const config = JSON.parse(fs.readFileSync(process.argv[2]), "utf8");
-
-const zoom = 13;
 
 const wmtsParams = {
   service: "WMTS",
@@ -112,11 +111,18 @@ const offsets = [];
 for (let y = tiles[3]; y >= tiles[1]; y--) {
   for (let x = tiles[0]; x <= tiles[2]; x++) {
     const url = basisURL.toString() + `&tilecol=${x}&tilerow=${y}`;
-    console.log("Requesting:", url);
-    imageRequests.push(Jimp.read(url));
+    imageRequests.push(
+      Jimp.read({
+        url,
+        options: {
+          timeout: 20000,
+        },
+      })
+    );
     offsets.push([(x - tiles[0]) * tileSize, (y - tiles[1]) * tileSize]);
   }
 }
+console.log(`Requesting ${imageRequests.length} image tiles`);
 
 const images = await Promise.all(imageRequests);
 
@@ -131,6 +137,8 @@ new Jimp(textureSize[0], textureSize[1], (err, textureImage) => {
   });
 
   const [left, top, width, height] = getCropValues(tiles, zoom);
+
+  console.log(`Output image: ${width} x ${height} px`);
 
   textureImage
     .crop(left, top, width, height)
