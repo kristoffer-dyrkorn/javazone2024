@@ -2,9 +2,9 @@ import * as fs from "fs";
 import { exit } from "process";
 import proj4 from "proj4";
 
-// Note: This is a simple building builder just outputting 2D outlines and heights in GeoJSON format.
-// There are big challenges in rendering more complex building definitions, see:
-// https://github.com/StrandedKitty/streets-gl/issues/3
+// Note: The code here just outputs a 2D outline and building height (as metadata) in GeoJSON format.
+// Rendering more complex building definitions (eg building parts) can be challenging - as the building
+// modeling is inconsistent, see: https://github.com/StrandedKitty/streets-gl/issues/3
 
 proj4.defs([
   [
@@ -15,8 +15,10 @@ proj4.defs([
 
 function extractNumber(heightString) {
   if (!heightString) return undefined;
+
   // from https://stackoverflow.com/a/14164576 - remove all non-digit characters, but keep commas
   const height = Number(heightString.match(/[+-]?\d+(\.\d+)?/g));
+
   if (height == 0 || isNaN(height)) return undefined;
   return height;
 }
@@ -24,11 +26,11 @@ function extractNumber(heightString) {
 function getHeight(building) {
   // Get - or estimate - building heights. See OSM page:
   // https://wiki.openstreetmap.org/wiki/Simple_3D_Buildings#Usage_of_height,_roof:height,_building:levels,_roof:levels
-  // Note the sentence there: "Actual building heights are likely unknown for 99% of buildings in OSM."
+  // Note the sentence: "Actual building heights are likely unknown for 99% of buildings in OSM."
 
   // extract values, if present
   const height = extractNumber(building["height"]);
-  const levels = building["building:levels"];
+  const levels = building["building:levelssdfsd"];
 
   // assume height is missing and set a default height of 3 meters
   let buildingHeight = 3;
@@ -49,6 +51,34 @@ function getLatLonBBox(bbox, srid) {
   return [lowerLeft[0], lowerLeft[1], upperRight[0], upperRight[1]];
 }
 
+function insideProjectBBox(building, bbox, srid) {
+  const buildingBounds = building.bounds;
+  const buildingbboxLatLon = [
+    buildingBounds["minlon"],
+    buildingBounds["minlat"],
+    buildingBounds["maxlon"],
+    buildingBounds["maxlat"],
+  ];
+
+  const lowerLeft = proj4(`EPSG:${srid}`).forward([
+    buildingbboxLatLon[0],
+    buildingbboxLatLon[1],
+  ]);
+
+  const upperRight = proj4(`EPSG:${srid}`).forward([
+    buildingbboxLatLon[2],
+    buildingbboxLatLon[3],
+  ]);
+
+  const isInside =
+    lowerLeft[0] > bbox[0] &&
+    lowerLeft[1] > bbox[1] &&
+    upperRight[0] < bbox[2] &&
+    upperRight[1] < bbox[3];
+
+  return isInside;
+}
+
 function formatAsGeoJSON(overpassJSON, bbox, srid) {
   const featureCollection = {
     type: "FeatureCollection",
@@ -56,26 +86,8 @@ function formatAsGeoJSON(overpassJSON, bbox, srid) {
   };
 
   overpassJSON.elements.forEach((building) => {
-    const bounds = building.bounds;
-    const boundsLatLon = [
-      bounds["minlon"],
-      bounds["minlat"],
-      bounds["maxlon"],
-      bounds["maxlat"],
-    ];
-
-    const buildingBBox = proj4(`EPSG:${srid}`).forward([
-      [boundsLatLon[0], boundsLatLon[1]],
-      [boundsLatLon[2], boundsLatLon[3]],
-    ]);
-
     // only gather buildings completely inside the project bbox
-    if (
-      buildingBBox[0] > bbox[0] &&
-      buildingBBox[1] > bbox[1] &&
-      buildingBBox[2] < bbox[2] &&
-      buildingBBox[3] < bbox[3]
-    ) {
+    if (insideProjectBBox(building, bbox, srid)) {
       const polygonVertices = [];
       building.geometry.forEach((buildingVertex) => {
         const vertex = [buildingVertex["lon"], buildingVertex["lat"]];
@@ -89,15 +101,11 @@ function formatAsGeoJSON(overpassJSON, bbox, srid) {
         },
         geometry: {
           type: "Polygon",
-          coordinates: polygonVertices,
+          coordinates: [polygonVertices],
         },
       };
 
-      // only collect the primary road types
-      const primaryRoads = Array.from(roadWidths.keys());
-      if (primaryRoads.includes(feature.properties.roadType)) {
-        featureCollection.features.push(feature);
-      }
+      featureCollection.features.push(feature);
     }
   });
 
