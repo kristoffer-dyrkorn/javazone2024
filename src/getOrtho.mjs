@@ -110,7 +110,7 @@ const offsets = [];
 
 for (let y = tiles[3]; y >= tiles[1]; y--) {
   for (let x = tiles[0]; x <= tiles[2]; x++) {
-    const url = basisURL.toString() + `&tilecol=${x}&tilerow=${y}`;
+    const url = `${basisURL.toString()}&tilecol=${x}&tilerow=${y}`;
     imageRequests.push(
       Jimp.read({
         url,
@@ -142,5 +142,5 @@ new Jimp(textureSize[0], textureSize[1], (err, textureImage) => {
 
   textureImage
     .crop(left, top, width, height)
-    .write(config["project_name"] + "-ortho.png");
+    .write(`${config["project_name"]}-ortho.png`);
 });

@@ -23,10 +23,10 @@ const wcsParams = {
 };
 
 const urlParams = new URLSearchParams(wcsParams);
-const url = new URL(config["terrain_url"] + "?" + urlParams.toString());
+const url = new URL(`${config["terrain_url"]}?${urlParams.toString()}`);
 
 console.log("Requesting:", url.toString());
 
 const response = await fetch(url.toString());
 const data = await buffer(response.body);
-fs.writeFileSync(config["project_name"] + "-terrain.tiff", data);
+fs.writeFileSync(`${config["project_name"]}-terrain.tiff`, data);

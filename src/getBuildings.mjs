@@ -16,7 +16,7 @@ proj4.defs([
 function extractNumber(heightString) {
   if (!heightString) return undefined;
 
-  // from https://stackoverflow.com/a/14164576 - remove all non-digit characters, but keep commas
+  // from https://stackoverflow.com/a/14164576 : remove all non-digit characters, but keep commas
   const height = Number(heightString.match(/[+-]?\d+(\.\d+)?/g));
 
   if (height == 0 || isNaN(height)) return undefined;
@@ -24,18 +24,18 @@ function extractNumber(heightString) {
 }
 
 function getHeight(building) {
-  // Get - or estimate - building heights. See OSM page:
+  // Get (or estimate) building heights. See OSM page:
   // https://wiki.openstreetmap.org/wiki/Simple_3D_Buildings#Usage_of_height,_roof:height,_building:levels,_roof:levels
   // Note the sentence: "Actual building heights are likely unknown for 99% of buildings in OSM."
 
-  // extract values, if present
+  // extract useful values, if present
   const height = extractNumber(building["height"]);
-  const levels = building["building:levelssdfsd"];
+  const levels = building["building:levels"];
 
   // assume height is missing and set a default height of 3 meters
   let buildingHeight = 3;
 
-  // if level was set, use it instead, and assume 3 meters per level
+  // if levels was set, use it instead, and assume 3 meters per level
   if (levels) buildingHeight = levels * 3;
 
   // if the height was set, use it instead
@@ -122,7 +122,7 @@ const config = JSON.parse(fs.readFileSync(process.argv[2]), "utf8");
 const latLonBBox = getLatLonBBox(config["bbox"], config["project_srid"]);
 const urlParam = `data=[out:json];way["building"](${latLonBBox[1]},${latLonBBox[0]},${latLonBBox[3]},${latLonBBox[2]});out geom;`;
 
-const url = config["osm_url"] + "?" + urlParam;
+const url = `${config["osm_url"]}?${urlParam}`;
 
 console.log("Requesting: ", url);
 
@@ -135,4 +135,4 @@ const geoJSON = formatAsGeoJSON(
   config["project_srid"]
 );
 
-fs.writeFileSync(config["project_name"] + "-buildings.geojson", geoJSON);
+fs.writeFileSync(`${config["project_name"]}-buildings.geojson`, geoJSON);

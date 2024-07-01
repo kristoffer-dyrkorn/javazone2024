@@ -61,7 +61,6 @@ function formatAsGeoJSON(overpassJSON, bbox, srid) {
           roadType: roadType,
           name: road["tags"]["name"],
           width: width ? width : 7.5,
-          surface: road["tags"]["surface"],
         },
         geometry: {
           type: "LineString",
@@ -70,8 +69,8 @@ function formatAsGeoJSON(overpassJSON, bbox, srid) {
       };
 
       // only collect the primary road types
-      const primaryRoads = Array.from(roadWidths.keys());
-      if (primaryRoads.includes(feature.properties.roadType)) {
+      const primaryRoadTypes = Array.from(roadWidths.keys());
+      if (primaryRoadTypes.includes(feature.properties.roadType)) {
         featureCollection.features.push(feature);
       }
     }
@@ -90,7 +89,7 @@ const config = JSON.parse(fs.readFileSync(process.argv[2]), "utf8");
 const latLonBBox = getLatLonBBox(config["bbox"], config["project_srid"]);
 const urlParam = `data=[out:json];way["highway"](${latLonBBox[1]},${latLonBBox[0]},${latLonBBox[3]},${latLonBBox[2]});out geom;`;
 
-const url = config["osm_url"] + "?" + urlParam;
+const url = `${config["osm_url"]}?${urlParam}`;
 
 console.log("Requesting: ", url);
 
@@ -103,4 +102,4 @@ const geoJSON = formatAsGeoJSON(
   config["project_srid"]
 );
 
-fs.writeFileSync(config["project_name"] + "-roads.geojson", geoJSON);
+fs.writeFileSync(`${config["project_name"]}-roads.geojson`, geoJSON);

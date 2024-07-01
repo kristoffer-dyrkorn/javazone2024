@@ -1,5 +1,4 @@
 import { buffer } from "node:stream/consumers";
-import proj4 from "proj4";
 import * as fs from "fs";
 import { exit } from "process";
 
@@ -25,7 +24,7 @@ const wmsParams = {
 };
 
 const params = new URLSearchParams(wmsParams);
-const url = new URL(config["sentinel_url"] + "?" + params.toString());
+const url = new URL(`${config["sentinel_url"]}?${params.toString()}`);
 
 console.log("Requesting:", url.toString());
 
