@@ -71,6 +71,7 @@ for (let y = 0; y < height - 1; y++) {
   }
 }
 
+// output OBJ file with vertex coordinates in metres, relative to lower left corner of project bbox
 fs.writeFileSync(`${config["project_name"]}.obj`, objString);
 
 console.log(

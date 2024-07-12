@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@kylebarron/snap-to-tin": "^0.2.1"
+  }
+}

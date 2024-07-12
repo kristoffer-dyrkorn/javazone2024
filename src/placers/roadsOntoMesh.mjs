@@ -46,7 +46,7 @@ if (process.argv.length != 3) {
   const features = roads.features;
 
   // reproject from latlon to project coordinate system and make coordinates relative to project bbox
-  // so they match the terrain (OBJ file) coordinates
+  // (which we also do for the terrain) so the two match
   features.forEach((feature) => {
     const localCoordinates = feature.geometry.coordinates.map((roadVertex) => {
       const reprojectedVertex = proj4(`EPSG:${srid}`).forward([
@@ -64,27 +64,39 @@ if (process.argv.length != 3) {
   const snap = new SnapFeatures({
     indices: new Int32Array(triangles.flat()),
     positions: new Float32Array(vertices.flat()),
-    bounds: bbox,
   });
 
-  console.log(features[0].geometry);
   const snappedFeatures = snap.snapFeatures({ features });
 
-  // snapping creates a coordinate array containing both native arrays and Float32Arrays,
-  // this creates chaos when serializing to JSON, so normalize
+  // project coordinates back to latlon to stay geoJSON compliant
+  // at this point we start with coordinates relative to the lower left bbox,
+  // so add the lower left bbox coordinates before reprojecting
   snappedFeatures.forEach((snappedFeature) => {
-    const unifiedCoordinates = snappedFeature.geometry.coordinates.map((p) => {
-      return [p[0], p[1], p[2]];
-    });
-    snappedFeature.geometry.coordinates = unifiedCoordinates;
+    const latlonCoordinates = snappedFeature.geometry.coordinates.map(
+      (localCoordinate) => {
+        const latlonCoordinate = proj4(`EPSG:${srid}`).inverse([
+          bbox[0] + localCoordinate[0],
+          bbox[1] + localCoordinate[1],
+        ]);
+
+        // return values to centimeter precision (the xy unit is latlon degrees, z unit is meters)
+        return [
+          +latlonCoordinate[0].toFixed(7),
+          +latlonCoordinate[1].toFixed(7),
+          +localCoordinate[2].toFixed(2),
+        ];
+      }
+    );
+    snappedFeature.geometry.coordinates = latlonCoordinates;
   });
 
-  // overwrite original geoJSON with snapped geometries while keeping the rest
+  // for each feature, replace the original geometry with the snapped geometry,
+  // while keeping the remaining properties of the feature unchanged
   for (let i = 0; i < features.length; i++) {
     features[i].geometry.coordinates = snappedFeatures[i].geometry.coordinates;
   }
 
+  // output road coordinates in latlon coordinates with elevation in metres as the third coordinate
   const outputGeoJSON = `${config["project_name"]}-roads-placed.geojson`;
-
   fs.writeFileSync(outputGeoJSON, JSON.stringify(roads));
 }
