@@ -2,24 +2,32 @@
 
 # Getting data
 
-getTerrain (get GeoTIFF, via WCS)
-getSatellite (get Sentinel image, via WMS, as as png)
-getOrtho (get aerial photo, via WMTS, by stitching jpeg tiles into a a png)
-getRoads (get roads from OSM, as GeoJSON)
-getBuildings (get buildings from OSM, as GeoJSON)
+- getTerrain (get GeoTIFF, via WCS)
+- getSatellite (get Sentinel image, via WMS, as as png)
+- getOrtho (get aerial photo, via WMTS, by stitching jpeg tiles into a a png)
+- getRoads (get roads from OSM, as GeoJSON)
+- getBuildings (get buildings from OSM, as GeoJSON)
 
-# Converting data to geometries
+# Converting terrain to geometries
 
-createTerrainMesh (convert GeoTIFF height map to OBJ mesh)
-createRoadGeometries (clamp GeoJSON line strings onto terrain surface, extrude to box tubes with set width, and save as OBJ mesh)
-createBuildingGeometries (clamp GeoJSON polygons onto terrain surface, extrude to building height and terrain slope, and save as OBJ mesh)
+- terrainToMesh (convert GeoTIFF height map to OBJ mesh)
+
+# Placing geometries onto terrain
+
+- roadsOntoMesh (clamp GeoJSON line strings onto terrain surface)
+- buildingsOntoMesh (clamp GeoJSON outlines onto terrain surface, extrude up to building height and down to lowest terrain elevation for the outline)
+
+# Converting remaining data types to geometries
+
+- roadsToMesh (convert placed roads to OBJ mesh)
+- buildingsToMesh (convert placed buildings to OBJ mesh)
 
 # Presenting data
 
-read terrain mesh (OBJ)
-read satellite / ortho teture (png), drape onto terrain
-read building geometries (OBJ)
-read road geometries (OBJ)
+- read terrain mesh (OBJ)
+- read satellite / ortho teture (png), drape onto terrain
+- read building geometries (OBJ)
+- read road geometries (OBJ)
 
 # Exporting data
 
