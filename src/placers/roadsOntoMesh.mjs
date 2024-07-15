@@ -46,14 +46,6 @@ if (process.argv.length != 3) {
   exit()
 }
 
-removeDuplicateVertices([
-  [1, 1, 0],
-  [1, 1, 0],
-  [1, 1, 0],
-  [1, 3, 0],
-  [1, 1, 0],
-])
-
 const config = JSON.parse(fs.readFileSync(process.argv[2]), "utf8")
 
 const bbox = config.bbox
@@ -80,6 +72,8 @@ const snap = new SnapFeatures({
   positions: new Float32Array(vertices.flat()),
 })
 
+// snap 2D features onto the triangles in the 2.5D mesh surface
+// note: in this case, road tunnels will *not* be handled correctly
 const snappedFeatures = snap.snapFeatures({ features })
 
 // project coordinates back to latlon to stay geoJSON compliant
@@ -93,7 +87,7 @@ snappedFeatures.forEach((snappedFeature) => {
     return [+latlonCoordinate[0].toFixed(5), +latlonCoordinate[1].toFixed(5), +snapVertex[2].toFixed(2)]
   })
 
-  // remove duplicate vertices along the line
+  // remove duplicates *in the sequence* along the line
   snappedFeature.geometry.coordinates = removeDuplicateVertices(latlonCoordinates)
 })
 

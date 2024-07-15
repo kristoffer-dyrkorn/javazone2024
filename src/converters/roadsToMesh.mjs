@@ -4,25 +4,25 @@ import proj4 from "proj4"
 
 proj4.defs([["EPSG:25833", "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs"]])
 
-function getNormal(a, b) {
+function getScaledNormal(a, b, scale) {
   const dx = b[0] - a[0]
   const dy = b[1] - a[1]
-  let length = Math.hypot(dx, dy)
+  const length = (Math.hypot(dx, dy) * scale) / 2
+
   if (length < 0.001) {
     console.log("duplicate points:", a, b)
     exit()
   }
 
-  return [-dy / length, dx / length]
+  return [dy / length, -dx / length]
 }
 
 function getRoadQuad(v1, v2, width) {
-  const normal = getNormal(v1, v2)
-  const scaledNormal = [(normal[0] * width) / 2, (normal[1] * width) / 2]
-  const a = [v1[0] + scaledNormal[0], v1[1] + scaledNormal[1], v1[2]]
-  const b = [v1[0] - scaledNormal[0], v1[1] - scaledNormal[1], v1[2]]
-  const c = [v2[0] - scaledNormal[0], v2[1] - scaledNormal[1], v2[2]]
-  const d = [v2[0] + scaledNormal[0], v2[1] + scaledNormal[1], v2[2]]
+  const normal = getScaledNormal(v1, v2, width)
+  const a = [v1[0] - normal[0], v1[1] - normal[1], v1[2]]
+  const b = [v1[0] + normal[0], v1[1] + normal[1], v1[2]]
+  const c = [v2[0] + normal[0], v2[1] + normal[1], v2[2]]
+  const d = [v2[0] - normal[0], v2[1] - normal[1], v2[2]]
 
   return [a, b, c, a, c, d]
 }
