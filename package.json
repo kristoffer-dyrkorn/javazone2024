@@ -1,6 +1,9 @@
 {
   "dependencies": {
     "@kylebarron/snap-to-tin": "^0.2.1",
-    "earcut": "^3.0.0"
+    "earcut": "^3.0.0",
+    "geotiff": "^2.1.3",
+    "jimp": "^0.22.12",
+    "proj4": "^2.11.0"
   }
 }
