@@ -30,10 +30,29 @@ function readOBJ(fileName) {
   return { vertices, triangles }
 }
 
+function removeDuplicateVertices(vertices) {
+  const uniqueVertices = [vertices[0]]
+  vertices.forEach((v) => {
+    const previousVertex = uniqueVertices[uniqueVertices.length - 1]
+    if (v[0] != previousVertex[0] || v[1] != previousVertex[1]) {
+      uniqueVertices.push(v)
+    }
+  })
+  return uniqueVertices
+}
+
 if (process.argv.length != 3) {
   console.log("Usage: node roadsOntoMesh.mjs <config file>")
   exit()
 }
+
+removeDuplicateVertices([
+  [1, 1, 0],
+  [1, 1, 0],
+  [1, 1, 0],
+  [1, 3, 0],
+  [1, 1, 0],
+])
 
 const config = JSON.parse(fs.readFileSync(process.argv[2]), "utf8")
 
@@ -70,10 +89,12 @@ snappedFeatures.forEach((snappedFeature) => {
   const latlonCoordinates = snappedFeature.geometry.coordinates.map((snapVertex) => {
     const latlonCoordinate = proj4(`EPSG:${srid}`).inverse([bbox[0] + snapVertex[0], bbox[1] + snapVertex[1]])
 
-    // return values to centimeter precision (the xy unit is latlon degrees, z unit is meters)
-    return [+latlonCoordinate[0].toFixed(7), +latlonCoordinate[1].toFixed(7), +snapVertex[2].toFixed(2)]
+    // return values to meter precision (the xy unit is latlon degrees, z unit is meters)
+    return [+latlonCoordinate[0].toFixed(5), +latlonCoordinate[1].toFixed(5), +snapVertex[2].toFixed(2)]
   })
-  snappedFeature.geometry.coordinates = latlonCoordinates
+
+  // remove duplicate vertices along the line
+  snappedFeature.geometry.coordinates = removeDuplicateVertices(latlonCoordinates)
 })
 
 // for each feature, replace the original geometry with the snapped geometry,
