@@ -3,13 +3,13 @@ import { exit } from "process";
 import { fromFile } from "geotiff";
 
 if (process.argv.length != 4) {
-  console.log("Usage: node tiff2obj.mjs <skip> <config file>");
+  console.log("Usage: node terrainToMesh.mjs <skip> <config file>");
   exit();
 }
 
-const skip = Number(process.argv[2]);
+const skip = +process.argv[2];
 const config = JSON.parse(fs.readFileSync(process.argv[3]), "utf8");
-const tiffFile = `${config["project_name"]}-terrain.tiff`;
+const tiffFile = `${config.project_name}-terrain.tiff`;
 
 const tiff = await fromFile(tiffFile);
 const image = await tiff.getImage();
@@ -38,13 +38,13 @@ for (let y = 0; y < height; y++) {
     const py = y * skip;
     const pz = data[0][width * y + x];
 
-    // flip y coordinate as geotiff y goes downwards
+    // flip y coordinate as geotiff y points south while mesh y points north
     // quantize elevation values to 0.1m values
     objString += `v ${px} ${(height - y - 1) * skip} ${pz.toFixed(1)}\n`;
   }
 }
 
-// output texture coordinates for the vertices
+// output texture coordinates for each vertex
 for (let y = 0; y < height; y++) {
   for (let x = 0; x < width; x++) {
     // map coordinates to 0..1
@@ -56,7 +56,7 @@ for (let y = 0; y < height; y++) {
   }
 }
 
-// output triangles
+// output triangles - from south to north and then from west to east
 for (let y = 0; y < height - 1; y++) {
   for (let x = 0; x < width - 1; x++) {
     // in the OBJ format indices are 1-based, so add 1
@@ -71,8 +71,8 @@ for (let y = 0; y < height - 1; y++) {
   }
 }
 
-// output OBJ file with vertex coordinates in metres, relative to lower left corner of project bbox
-fs.writeFileSync(`${config["project_name"]}.obj`, objString);
+// output: OBJ file with vertex coordinates in metres, relative to lower left corner of project bbox
+fs.writeFileSync(`${config.project_name}-terrain.obj`, objString);
 
 console.log(
   `Wrote ${height * width} vertices, ${

@@ -35,7 +35,7 @@ function formatAsGeoJSON(overpassJSON, bbox, srid) {
     const lineStringCoordinates = [];
 
     road.geometry.forEach((roadVertex) => {
-      const vertex = [roadVertex["lon"], roadVertex["lat"]];
+      const vertex = [roadVertex.lon, roadVertex.lat];
 
       const coordinate = proj4(`EPSG:${srid}`).forward([vertex[0], vertex[1]]);
 
@@ -52,14 +52,14 @@ function formatAsGeoJSON(overpassJSON, bbox, srid) {
 
     // reject features that are outside the project bbox
     if (lineStringCoordinates.length > 0) {
-      const roadType = road["tags"]["highway"];
+      const roadType = road.tags.highway;
       const width = roadWidths.get(roadType);
 
       const feature = {
         type: "Feature",
         properties: {
           roadType: roadType,
-          name: road["tags"]["name"],
+          name: road.tags.name,
           width: width ? width : 7.5,
         },
         geometry: {
@@ -86,20 +86,16 @@ if (process.argv.length != 3) {
 
 const config = JSON.parse(fs.readFileSync(process.argv[2]), "utf8");
 
-const latLonBBox = getLatLonBBox(config["bbox"], config["project_srid"]);
+const latLonBBox = getLatLonBBox(config.bbox, config.project_srid);
 const urlParam = `data=[out:json];way["highway"](${latLonBBox[1]},${latLonBBox[0]},${latLonBBox[3]},${latLonBBox[2]});out geom;`;
 
-const url = `${config["osm_url"]}?${urlParam}`;
+const url = `${config.osm_url}?${urlParam}`;
 
 console.log("Requesting: ", url);
 
 const response = await fetch(url);
 const overpassJSON = await response.json();
 
-const geoJSON = formatAsGeoJSON(
-  overpassJSON,
-  config["bbox"],
-  config["project_srid"]
-);
+const geoJSON = formatAsGeoJSON(overpassJSON, config.bbox, config.project_srid);
 
-fs.writeFileSync(`${config["project_name"]}-roads.geojson`, geoJSON);
+fs.writeFileSync(`${config.project_name}-roads.geojson`, geoJSON);

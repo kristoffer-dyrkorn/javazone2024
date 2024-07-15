@@ -29,7 +29,7 @@ function getHeight(building) {
   // Note the sentence: "Actual building heights are likely unknown for 99% of buildings in OSM."
 
   // extract useful values, if present
-  const height = extractNumber(building["height"]);
+  const height = extractNumber(building.height);
   const levels = building["building:levels"];
 
   // assume height is missing and set a default height of 3 meters
@@ -54,10 +54,10 @@ function getLatLonBBox(bbox, srid) {
 function insideProjectBBox(building, bbox, srid) {
   const buildingBounds = building.bounds;
   const buildingbboxLatLon = [
-    buildingBounds["minlon"],
-    buildingBounds["minlat"],
-    buildingBounds["maxlon"],
-    buildingBounds["maxlat"],
+    buildingBounds.minlon,
+    buildingBounds.minlat,
+    buildingBounds.maxlon,
+    buildingBounds.maxlat,
   ];
 
   const lowerLeft = proj4(`EPSG:${srid}`).forward([
@@ -90,7 +90,7 @@ function formatAsGeoJSON(overpassJSON, bbox, srid) {
     if (insideProjectBBox(building, bbox, srid)) {
       const polygonVertices = [];
       building.geometry.forEach((buildingVertex) => {
-        const vertex = [buildingVertex["lon"], buildingVertex["lat"]];
+        const vertex = [buildingVertex.lon, buildingVertex.lat];
         polygonVertices.push(vertex);
       });
 
@@ -119,20 +119,16 @@ if (process.argv.length != 3) {
 
 const config = JSON.parse(fs.readFileSync(process.argv[2]), "utf8");
 
-const latLonBBox = getLatLonBBox(config["bbox"], config["project_srid"]);
+const latLonBBox = getLatLonBBox(config.bbox, config.project_srid);
 const urlParam = `data=[out:json];way["building"](${latLonBBox[1]},${latLonBBox[0]},${latLonBBox[3]},${latLonBBox[2]});out geom;`;
 
-const url = `${config["osm_url"]}?${urlParam}`;
+const url = `${config.osm_url}?${urlParam}`;
 
 console.log("Requesting: ", url);
 
 const response = await fetch(url);
 const overpassJSON = await response.json();
 
-const geoJSON = formatAsGeoJSON(
-  overpassJSON,
-  config["bbox"],
-  config["project_srid"]
-);
+const geoJSON = formatAsGeoJSON(overpassJSON, config.bbox, config.project_srid);
 
-fs.writeFileSync(`${config["project_name"]}-buildings.geojson`, geoJSON);
+fs.writeFileSync(`${config.project_name}-buildings.geojson`, geoJSON);

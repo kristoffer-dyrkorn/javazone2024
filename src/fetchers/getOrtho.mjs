@@ -100,9 +100,9 @@ const wmtsParams = {
 };
 
 const params = new URLSearchParams(wmtsParams);
-const basisURL = new URL(`${config["ortho_url"]}?${params.toString()}`);
+const basisURL = new URL(`${config.ortho_url}?${params.toString()}`);
 
-const bbox = config["bbox"];
+const bbox = config.bbox;
 const tiles = getTiles(bbox, zoom);
 
 const imageRequests = [];
@@ -142,5 +142,5 @@ new Jimp(textureSize[0], textureSize[1], (err, textureImage) => {
 
   textureImage
     .crop(left, top, width, height)
-    .write(`${config["project_name"]}-ortho.png`);
+    .write(`${config.project_name}-ortho.png`);
 });
