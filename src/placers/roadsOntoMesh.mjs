@@ -83,11 +83,16 @@ snappedFeatures.forEach((snappedFeature) => {
   const latlonCoordinates = snappedFeature.geometry.coordinates.map((snapVertex) => {
     const latlonCoordinate = proj4(`EPSG:${srid}`).inverse([bbox[0] + snapVertex[0], bbox[1] + snapVertex[1]])
 
-    // return values to meter precision (the xy unit is latlon degrees, z unit is meters)
-    return [+latlonCoordinate[0].toFixed(5), +latlonCoordinate[1].toFixed(5), +snapVertex[2].toFixed(2)]
+    // set road elevation to be 1 meter above terrain surface
+    const roadElevation = +snapVertex[2].toFixed(2) + 1
+
+    // the xy unit is latlon degrees, z unit is meters
+    // return latlon coordinates that are quantized to 5 digits of precision
+    // meaning approximately 1 meter
+    return [+latlonCoordinate[0].toFixed(5), +latlonCoordinate[1].toFixed(5), roadElevation]
   })
 
-  // remove duplicates *in the sequence* along the line
+  // remove any repeated vertices along the line (introduced by the quantization above)
   snappedFeature.geometry.coordinates = removeDuplicateVertices(latlonCoordinates)
 })
 

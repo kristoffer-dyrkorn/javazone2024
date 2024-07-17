@@ -1,24 +1,25 @@
 import * as fs from "fs"
 import { exit } from "process"
 import proj4 from "proj4"
+import { start } from "repl"
 
 proj4.defs([["EPSG:25833", "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs"]])
 
 function getScaledNormal(a, b, scale) {
   const dx = b[0] - a[0]
   const dy = b[1] - a[1]
-  const length = (Math.hypot(dx, dy) * scale) / 2
+  const length = Math.hypot(dx, dy)
 
   if (length < 0.001) {
     console.log("duplicate points:", a, b)
     exit()
   }
 
-  return [dy / length, -dx / length]
+  return [(scale * dy) / length, (scale * -dx) / length]
 }
 
 function getRoadQuad(v1, v2, width) {
-  const normal = getScaledNormal(v1, v2, width)
+  const normal = getScaledNormal(v1, v2, width / 2)
   const a = [v1[0] - normal[0], v1[1] - normal[1], v1[2]]
   const b = [v1[0] + normal[0], v1[1] + normal[1], v1[2]]
   const c = [v2[0] + normal[0], v2[1] + normal[1], v2[2]]
@@ -27,10 +28,29 @@ function getRoadQuad(v1, v2, width) {
   return [a, b, c, a, c, d]
 }
 
+function getLength(a, b) {
+  const dx = b[0] - a[0]
+  const dy = b[1] - a[1]
+  return Math.hypot(dx, dy)
+}
+
 function getRoadMesh(vertices, width) {
   const roadVertices = []
-  for (let i = 0; i < vertices.length - 1; i++) {
-    roadVertices.push(getRoadQuad(vertices[i], vertices[i + 1], width))
+  let startIndex = 0
+  let endIndex = 1
+
+  // simplify the geometry a bit - and only build segments longer than 10 m
+  while (endIndex < vertices.length - 1) {
+    if (getLength(vertices[startIndex], vertices[endIndex]) > 10) {
+      roadVertices.push(getRoadQuad(vertices[startIndex], vertices[endIndex], width))
+      startIndex = endIndex
+    }
+    endIndex++
+  }
+
+  // add final segment (likely shorter than 10 m) for completeness
+  if (startIndex != endIndex) {
+    roadVertices.push(getRoadQuad(vertices[startIndex], vertices[endIndex], width))
   }
   return roadVertices.flat()
 }
