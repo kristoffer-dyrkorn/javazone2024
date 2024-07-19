@@ -1,8 +1,8 @@
 import * as THREE from "three"
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js"
-import { ArcballControls } from "three/addons/controls/ArcballControls.js"
+import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 
-// set Z as default up everywhere
+// set +Z as up axis everywhere
 THREE.Object3D.DEFAULT_UP.set(0, 0, 1)
 
 const renderer = new THREE.WebGLRenderer()
@@ -13,13 +13,11 @@ document.body.appendChild(renderer.domElement)
 const scene = new THREE.Scene()
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 5, 10000)
-camera.position.set(0, -1500, 500)
+camera.position.set(1500, -500, 700)
 
-const controls = new ArcballControls(camera, renderer.domElement)
-
-controls.addEventListener("change", function () {
-  renderer.render(scene, camera)
-})
+const controls = new OrbitControls(camera, renderer.domElement)
+controls.target.set(1500, 1500, 0)
+controls.update()
 
 const light = new THREE.AmbientLight(1.0)
 scene.add(light)
@@ -29,9 +27,18 @@ scene.add(directionalLight)
 
 const objLoader = new OBJLoader()
 objLoader.load("./andalsnes-terrain.obj", (object) => {
-  // HACK
-  object.children[0].geometry.center()
-  //
   scene.add(object)
+  renderer.render(scene, camera)
+})
+
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight
+  camera.updateProjectionMatrix()
+
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.render(scene, camera)
+})
+
+controls.addEventListener("change", () => {
   renderer.render(scene, camera)
 })
