@@ -17,7 +17,7 @@
 - roadsOntoMesh (clamp GeoJSON line strings onto terrain surface)
 - buildingsOntoMesh (clamp GeoJSON outlines onto terrain surface, extrude up to building height and down to lowest terrain elevation for the outline)
 
-# Converting remaining data types to geometries
+# Converting roads and buildings to geometries
 
 - roadsToMesh (convert placed roads to OBJ mesh)
 - buildingsToMesh (convert placed buildings to OBJ mesh)
@@ -25,7 +25,7 @@
 # Presenting data
 
 - read terrain mesh (OBJ)
-- read satellite / ortho teture (png), drape onto terrain
+- read satellite / ortho texture (png), drape onto terrain
 - read building geometries (OBJ)
 - read road geometries (OBJ)
 

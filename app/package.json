@@ -1,0 +1,13 @@
+{
+  "name": "virtual-worlds",
+  "type": "module",
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "three": "^0.166.1"
+  },
+  "devDependencies": {
+    "vite": "^5.3.4"
+  }
+}
