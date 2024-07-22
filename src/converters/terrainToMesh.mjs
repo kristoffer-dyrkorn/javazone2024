@@ -19,9 +19,10 @@ const fullHeight = image.getHeight()
 
 console.log(`Original height map: ${fullWidth}, ${fullHeight}`)
 
+// rescale while keeping the full geographic extent of the original area
 const data = await image.readRasters({
-  width: Math.ceil(fullWidth / skip),
-  height: Math.ceil(fullHeight / skip),
+  width: Math.ceil(fullWidth / skip) + 1,
+  height: Math.ceil(fullHeight / skip) + 1,
   resampleMethod: "bilinear",
 })
 
@@ -29,7 +30,8 @@ const { width, height } = data
 
 console.log(`Rescaled to: ${width}, ${height}`)
 
-let objString = ""
+fs.unlinkSync(`${config.project_name}-terrain.obj`)
+const fileStream = fs.createWriteStream(`${config.project_name}-terrain.obj`, { flags: "a" })
 
 // output vertex coordinates, relative to lower left corner
 for (let y = 0; y < height; y++) {
@@ -40,7 +42,7 @@ for (let y = 0; y < height; y++) {
 
     // flip y coordinate as geotiff y points south while mesh y points north
     // quantize elevation values to 0.1m values
-    objString += `v ${px} ${(height - y - 1) * skip} ${pz.toFixed(1)}\n`
+    fileStream.write(`v ${px} ${(height - y - 1) * skip} ${pz.toFixed(1)}\n`)
   }
 }
 
@@ -52,7 +54,7 @@ for (let y = 0; y < height; y++) {
     const ty = (height - y - 1) / (height - 1)
 
     // quantize coordinates to 4 fractional digits
-    objString += `vt ${tx.toFixed(4)} ${ty.toFixed(4)}\n`
+    fileStream.write(`vt ${tx.toFixed(4)} ${ty.toFixed(4)}\n`)
   }
 }
 
@@ -66,12 +68,12 @@ for (let y = 0; y < height - 1; y++) {
     const v4 = v1 + width
 
     // output faces along with uv coords
-    objString += `f ${v1}/${v1} ${v3}/${v3} ${v2}/${v2}\n`
-    objString += `f ${v1}/${v1} ${v4}/${v4} ${v3}/${v3}\n`
+    fileStream.write(`f ${v1}/${v1} ${v3}/${v3} ${v2}/${v2}\n`)
+    fileStream.write(`f ${v1}/${v1} ${v4}/${v4} ${v3}/${v3}\n`)
   }
 }
 
 // output: OBJ file with vertex coordinates in metres, relative to lower left corner of project bbox
-fs.writeFileSync(`${config.project_name}-terrain.obj`, objString)
+fileStream.end()
 
 console.log(`Wrote ${height * width} vertices, ${2 * (height - 1) * (width - 1)} triangles`)
