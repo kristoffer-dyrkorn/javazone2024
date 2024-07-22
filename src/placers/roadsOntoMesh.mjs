@@ -73,7 +73,7 @@ const snap = new SnapFeatures({
 })
 
 // snap 2D features onto the triangles in the 2.5D mesh surface
-// note: in this case, road tunnels will *not* be handled correctly
+// note: in this case, road tunnels and bridges will *not* be handled correctly
 const snappedFeatures = snap.snapFeatures({ features })
 
 // project coordinates back to latlon to stay geoJSON compliant
@@ -83,8 +83,9 @@ snappedFeatures.forEach((snappedFeature) => {
   const latlonCoordinates = snappedFeature.geometry.coordinates.map((snapVertex) => {
     const latlonCoordinate = proj4(`EPSG:${srid}`).inverse([bbox[0] + snapVertex[0], bbox[1] + snapVertex[1]])
 
-    // set road elevation to be 1 meter above terrain surface
-    const roadElevation = +snapVertex[2].toFixed(2) + 1
+    // set road elevation to be 2 meter above terrain surface
+    // just an arbitrary value to make the road appear on top of the terrain
+    const roadElevation = +snapVertex[2].toFixed(2) + 2
 
     // the xy unit is latlon degrees, z unit is meters
     // return latlon coordinates that are quantized to 5 digits of precision
