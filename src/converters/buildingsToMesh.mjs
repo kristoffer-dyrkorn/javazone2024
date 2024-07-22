@@ -64,6 +64,16 @@ function toOBJIndices(vertices, offset) {
   return indicesString
 }
 
+function isCounterClockWise(vertices) {
+  let doubleArea = 0
+  for (let i = 0; i < vertices.length; i++) {
+    const j = (i + 1) % vertices.length
+    doubleArea += vertices[i][0] * vertices[j][1]
+    doubleArea -= vertices[j][0] * vertices[i][1]
+  }
+  return doubleArea > 0
+}
+
 if (process.argv.length != 3) {
   console.log("Usage: node buildingsToMesh.mjs <config file>")
   exit()
@@ -82,10 +92,15 @@ let totalVertices = 1
 
 features.forEach((building) => {
   // reproject from latlon to project coordinate system and make coordinates relative to project bbox
-  const buildingOutline = building.geometry.coordinates[0].map((buildingVertex) => {
+  let buildingOutline = building.geometry.coordinates[0].map((buildingVertex) => {
     const reprojectedVertex = proj4(`EPSG:${srid}`).forward([buildingVertex[0], buildingVertex[1]])
     return [reprojectedVertex[0] - bbox[0], reprojectedVertex[1] - bbox[1]]
   })
+
+  if (!isCounterClockWise(buildingOutline)) {
+    console.log("Detected incorrect winding order, repairing input")
+    buildingOutline = buildingOutline.reverse()
+  }
 
   const buildingVertices = getBuildingMesh(
     buildingOutline,
