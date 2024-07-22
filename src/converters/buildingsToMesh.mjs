@@ -66,7 +66,7 @@ function toOBJIndices(vertices, offset) {
 
 function isCounterClockWise(vertices) {
   let doubleArea = 0
-  for (let i = 0; i < vertices.length; i++) {
+  for (let i = 0; i < vertices.length - 1; i++) {
     const j = (i + 1) % vertices.length
     doubleArea += vertices[i][0] * vertices[j][1]
     doubleArea -= vertices[j][0] * vertices[i][1]
@@ -98,7 +98,7 @@ features.forEach((building) => {
   })
 
   if (!isCounterClockWise(buildingOutline)) {
-    console.log("Detected incorrect winding order, repairing input")
+    console.log("Detected incorrect winding order, repairing data")
     buildingOutline = buildingOutline.reverse()
   }
 
