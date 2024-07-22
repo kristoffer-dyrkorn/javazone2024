@@ -68,7 +68,7 @@ window.addEventListener("keydown", (keyboardEvent) => {
       if (!roadMesh) {
         objLoader.load("./andalsnes-roads.obj", (object) => {
           roadMesh = object.children[0]
-          roadMesh.material.color.set(0x555555)
+          roadMesh.material.color.set(0x777777)
           scene.add(roadMesh)
         })
       } else {
