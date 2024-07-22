@@ -8,12 +8,12 @@ proj4.defs([["EPSG:25833", "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0
 function createWalls(groundVertices, roofVertices) {
   const wallVertices = []
   for (let i = 0; i < groundVertices.length - 1; i++) {
+    wallVertices.push(groundVertices[i])
     wallVertices.push(groundVertices[i + 1])
-    wallVertices.push(groundVertices[i])
     wallVertices.push(roofVertices[i + 1])
     wallVertices.push(roofVertices[i + 1])
-    wallVertices.push(groundVertices[i])
     wallVertices.push(roofVertices[i])
+    wallVertices.push(groundVertices[i])
   }
   return wallVertices
 }
