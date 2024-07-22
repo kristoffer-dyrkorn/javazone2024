@@ -137,7 +137,8 @@ new Jimp(textureSize[0], textureSize[1], (err, textureImage) => {
 
   const [left, top, width, height] = getCropValues(tiles, zoom)
 
-  console.log(`Output image: ${width} x ${height} px`)
+  const resolution = (width / (bbox[3] - bbox[1])).toFixed(3)
+  console.log(`Output image: ${width} x ${height} px, resolution: ${resolution} pixels/meter`)
 
   textureImage.crop(left, top, width, height).write(`${config.project_name}-ortho.png`)
 })
