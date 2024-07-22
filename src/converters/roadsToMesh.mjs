@@ -39,7 +39,7 @@ function getRoadMesh(vertices, width) {
   let startIndex = 0
   let endIndex = 1
 
-  // simplify the geometry a bit - and only build segments longer than 10 m
+  // simple geometry simplification: collapse segments until the resulting section is longer than 10 m
   while (endIndex < vertices.length - 1) {
     if (getLength(vertices[startIndex], vertices[endIndex]) > 10) {
       roadVertices.push(getRoadQuad(vertices[startIndex], vertices[endIndex], width))
@@ -48,7 +48,7 @@ function getRoadMesh(vertices, width) {
     endIndex++
   }
 
-  // add final segment (likely shorter than 10 m) for completeness
+  // add final section (in general shorter than 10 m), if needed
   if (startIndex != endIndex) {
     roadVertices.push(getRoadQuad(vertices[startIndex], vertices[endIndex], width))
   }
