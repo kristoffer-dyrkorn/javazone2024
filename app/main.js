@@ -1,6 +1,7 @@
 import * as THREE from "three"
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js"
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"
+import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js"
 
 // set +Z as our up axis for the entire app
 THREE.Object3D.DEFAULT_UP.set(0, 0, 1)
@@ -47,6 +48,30 @@ window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight)
 })
 
+function exportScene(scene, filename) {
+  const exporter = new GLTFExporter()
+
+  exporter.parse(
+    scene,
+    (glb) => {
+      const blob = new Blob([glb], { type: "application/octet-stream" })
+
+      const link = document.createElement("a")
+      link.style.display = "none"
+      link.href = URL.createObjectURL(blob)
+      link.download = filename
+      document.body.appendChild(link)
+
+      link.click()
+      URL.revokeObjectURL(link.href)
+    },
+    () => {},
+    {
+      binary: true,
+    }
+  )
+}
+
 window.addEventListener("keydown", (keyboardEvent) => {
   switch (keyboardEvent.key) {
     case "t":
@@ -68,7 +93,7 @@ window.addEventListener("keydown", (keyboardEvent) => {
       if (!roadMesh) {
         objLoader.load("./andalsnes-roads.obj", (object) => {
           roadMesh = object.children[0]
-          roadMesh.material.color.set(0x777777)
+          roadMesh.material.color.set(0x333333)
           scene.add(roadMesh)
         })
       } else {
@@ -80,6 +105,9 @@ window.addEventListener("keydown", (keyboardEvent) => {
       break
     case "s":
       terrainMesh.material.map = satelliteTexture
+      break
+    case "x":
+      exportScene(scene, "scene.glb")
       break
   }
 })
