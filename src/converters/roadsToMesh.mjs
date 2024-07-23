@@ -66,7 +66,7 @@ function toOBJVertices(vertices) {
 
 function toOBJIndices(vertices, offset) {
   let indicesString = ""
-  for (let i = offset; i <= vertices.length - 1 + offset; i += 3) {
+  for (let i = offset; i < vertices.length + offset; i += 3) {
     indicesString += `f ${i} ${i + 1} ${i + 2}\n`
   }
 
