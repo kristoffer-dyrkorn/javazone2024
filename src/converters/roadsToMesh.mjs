@@ -34,21 +34,22 @@ function getLength(a, b) {
   return Math.hypot(dx, dy)
 }
 
-function getRoadMesh(vertices, width) {
+function getRoadMesh(vertices, width, minLength) {
   const roadVertices = []
   let startIndex = 0
   let endIndex = 1
 
-  // simple geometry simplification: collapse segments until the resulting section is longer than 10 m
+  // simplify geometry:
+  // append segments onto this section until it becomes longer than minLength
   while (endIndex < vertices.length - 1) {
-    if (getLength(vertices[startIndex], vertices[endIndex]) > 10) {
+    if (getLength(vertices[startIndex], vertices[endIndex]) > minLength) {
       roadVertices.push(getRoadQuad(vertices[startIndex], vertices[endIndex], width))
       startIndex = endIndex
     }
     endIndex++
   }
 
-  // add final section (in general shorter than 10 m), if needed
+  // add remaining section if needed - it will in general be shorter than minLength
   if (startIndex != endIndex) {
     roadVertices.push(getRoadQuad(vertices[startIndex], vertices[endIndex], width))
   }
@@ -97,7 +98,8 @@ features.forEach((road) => {
     return [reprojectedVertex[0] - bbox[0], reprojectedVertex[1] - bbox[1], roadVertex[2]]
   })
 
-  const roadVertices = getRoadMesh(roadLine, road.properties.width)
+  // build mesh vertices from roadLine segments (merge segments shorter than 5 meters)
+  const roadVertices = getRoadMesh(roadLine, road.properties.width, 5)
 
   objVertices += toOBJVertices(roadVertices)
   objIndices += toOBJIndices(roadVertices, totalVertices)
