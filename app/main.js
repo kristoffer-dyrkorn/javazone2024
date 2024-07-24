@@ -35,11 +35,18 @@ let buildingMesh
 let roadMesh
 
 const objLoader = new OBJLoader()
-objLoader.load("./andalsnes-terrain.obj", (object) => {
-  terrainMesh = object.children[0]
-  terrainMesh.material.map = satelliteTexture
-  scene.add(terrainMesh)
-})
+objLoader.load(
+  "./andalsnes-terrain.obj",
+  (object) => {
+    terrainMesh = object.children[0]
+    terrainMesh.material.map = satelliteTexture
+    scene.add(terrainMesh)
+  },
+  () => {},
+  (error) => {
+    console.log("Error loading OBJ", error)
+  }
+)
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight
@@ -65,7 +72,9 @@ function exportScene(scene, filename) {
       link.click()
       URL.revokeObjectURL(link.href)
     },
-    () => {},
+    (error) => {
+      console.log("Error while exporting scene as GLB", error)
+    },
     {
       binary: true,
     }
@@ -81,21 +90,35 @@ window.addEventListener("keydown", (keyboardEvent) => {
       break
     case "b":
       if (!buildingMesh) {
-        objLoader.load("./andalsnes-buildings.obj", (object) => {
-          buildingMesh = object.children[0]
-          scene.add(buildingMesh)
-        })
+        objLoader.load(
+          "./andalsnes-buildings.obj",
+          (object) => {
+            buildingMesh = object.children[0]
+            scene.add(buildingMesh)
+          },
+          () => {},
+          (error) => {
+            console.log("Error loading OBJ", error)
+          }
+        )
       } else {
         buildingMesh.visible = !buildingMesh.visible
       }
       break
     case "r":
       if (!roadMesh) {
-        objLoader.load("./andalsnes-roads.obj", (object) => {
-          roadMesh = object.children[0]
-          roadMesh.material.color.set(0x333333)
-          scene.add(roadMesh)
-        })
+        objLoader.load(
+          "./andalsnes-roads.obj",
+          (object) => {
+            roadMesh = object.children[0]
+            roadMesh.material.color.set(0x222222)
+            scene.add(roadMesh)
+          },
+          () => {},
+          (error) => {
+            console.log("Error loading OBJ", error)
+          }
+        )
       } else {
         roadMesh.visible = !roadMesh.visible
       }
