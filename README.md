@@ -6,6 +6,8 @@ License: [Creative commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by
 
 This implementation sets up a model of a 3x3 km region of Norway and uses the Norwegian mapping authority Kartverket, and Open Street Maps, as its data sources. The scripts should be fairly easy to adapt to other sources as they show how to use some of the most common protocols and APIs for geodata.
 
+## Example output
+
 ![Example output](./images/model.jpg)
 
 # Preprocessing
