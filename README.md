@@ -4,6 +4,10 @@ This repo contains an example implementation of the process flow discussed in my
 
 License: [Creative commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). In short, you are free to use the material, but not commercially. You must include attribution, and you must share derived material under this same licence.
 
+This implementation sets up a model of a 3x3 km region of Norway and uses the Norwegian mapping authority Kartverket, and Open Street Maps, as its data sources. The scripts should be fairly easy to adapt to other sources as they show how to use some of the most common protocols and APIs for geodata.
+
+![Example output](./blob/main/images/model.jpg)
+
 # Preprocessing
 
 The preprocessing module follows the Unix philosophy: It contains a set of scripts that each solves a single task, and writes output to a file that will be used by a later step.
