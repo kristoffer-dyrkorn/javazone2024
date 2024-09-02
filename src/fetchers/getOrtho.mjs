@@ -2,6 +2,7 @@ import * as fs from "fs"
 import { exit } from "process"
 import Jimp from "jimp"
 
+// values from https://opencache.statkart.no/gatekeeper/gk/gk.open_nib_utm33_wmts_v2?service=WMTS&request=GetCapabilities
 const zoomScale = [
   7.737142857141884e7, 3.868571428570942e7, 1.934285714285471e7, 9671428.571427355, 4835714.285713677,
   2417857.1428568386, 1208928.5714284193, 604464.2857142097, 302232.14285710483, 151116.07142855242, 75558.03571427621,
@@ -57,7 +58,7 @@ function getBBox(tiles, zoom) {
   ]
 }
 
-function getCropValues(tiles, zoom) {
+function calculateCrop(bbox, tiles, zoom) {
   const tileCountX = tiles[2] - tiles[0] + 1
   const tileCountY = tiles[3] - tiles[1] + 1
 
@@ -135,7 +136,7 @@ new Jimp(textureSize[0], textureSize[1], (err, textureImage) => {
     textureImage.blit(image, offset[0], offset[1])
   })
 
-  const [left, top, width, height] = getCropValues(tiles, zoom)
+  const [left, top, width, height] = calculateCrop(bbox, tiles, zoom)
 
   const resolution = (width / (bbox[3] - bbox[1])).toFixed(3)
   console.log(`Output image: ${width} x ${height} px, resolution: ${resolution} pixels/meter`)

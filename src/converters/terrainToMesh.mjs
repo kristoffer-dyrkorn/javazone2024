@@ -30,7 +30,10 @@ const { width, height } = data
 
 console.log(`Rescaled to: ${width}, ${height}`)
 
-fs.unlinkSync(`${config.project_name}-terrain.obj`)
+if (fs.existsSync(`${config.project_name}-terrain.obj`)) {
+  fs.unlinkSync(`${config.project_name}-terrain.obj`)
+}
+
 const fileStream = fs.createWriteStream(`${config.project_name}-terrain.obj`, { flags: "a" })
 
 // output vertex coordinates, relative to lower left corner

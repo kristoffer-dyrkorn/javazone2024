@@ -12,7 +12,7 @@ const config = JSON.parse(fs.readFileSync(process.argv[2]), "utf8")
 const bbox = config.bbox
 
 // satellite image resolution
-const pixelsPerMeter = 10
+const metersPerPixel = 10
 
 const wmsParams = {
   service: "WMS",
@@ -22,8 +22,8 @@ const wmsParams = {
   layers: "2020",
   bbox: bbox,
   crs: `EPSG:${config.project_srid}`,
-  width: (bbox[2] - bbox[0]) / pixelsPerMeter,
-  height: (bbox[3] - bbox[1]) / pixelsPerMeter,
+  width: (bbox[2] - bbox[0]) / metersPerPixel,
+  height: (bbox[3] - bbox[1]) / metersPerPixel,
 }
 
 const params = new URLSearchParams(wmsParams)
