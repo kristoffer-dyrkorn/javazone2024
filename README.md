@@ -2,7 +2,7 @@
 
 This repo contains an example implementation of the process flow discussed in my JavaZone 2024 talk "Building virtual worlds using open geodata". The code consists of two parts, written in plain JavaScript: Preprocessing scripts (for Node) and a simple web app (using three.js for data visualization).
 
-License: [Creative commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). In short, you are free to use the material, but not commercially, you must include attribution, and you must share derived material under this same licence.
+License: [Creative commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). In short, you are free to use the material, but not commercially. You must include attribution, and you must share derived material under this same licence.
 
 # Preprocessing
 
