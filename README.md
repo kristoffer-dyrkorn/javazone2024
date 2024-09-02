@@ -4,9 +4,9 @@ This repo contains an example implementation of the process flow discussed in my
 
 License: [Creative commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). In short, you are free to use the material, but not commercially. You must include attribution, and you must share derived material under this same licence.
 
-This implementation sets up a model of a 3x3 km region of Norway and uses the Norwegian mapping authority Kartverket, and Open Street Maps, as its data sources. The scripts should be fairly easy to adapt to other sources as they show how to use some of the most common protocols and APIs for geodata.
-
 ## Example output
+
+The code in this repo creates a GLB containing a 3D model of a 3x3 km region of Norway. It uses the Norwegian mapping authority (Kartverket) and Open Street Maps as its data sources. The scripts should be fairly easy to adapt to other data sources - as they show how to use the most common protocols and APIs for geodata.
 
 ![Example output](./images/model.jpg)
 
