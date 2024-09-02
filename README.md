@@ -1,14 +1,14 @@
 # Building virtual worlds
 
-This repo contains an example implementation of the process flow discussed in my JavaZone 2024 talk "Building virtual worlds using open geodata". The code consists of two main parts: Preprocessing (Node scripts) and data visualization (a web app).
+This repo contains an example implementation of the process flow discussed in my JavaZone 2024 talk "Building virtual worlds using open geodata". The code consists of two parts, written in plain JavaScript: Preprocessing scripts (for Node) and a simple web app (using three.js for data visualization).
 
 # Preprocessing
 
-The design of the preprocessing code follows the Unix command line philosophy: Each script solves a single task and writes output to a file that will be used in a later step.
+The preprocessing module follows the Unix philosophy: It contains a set of scripts that each solves a single task, and writes output to a file that will be used by a later step.
 
-All scripts read configuration settings from a file, here called `config.json`.
+All scripts read their configuration settings from a file, here called `config.json`. The name of the config file is a mandatory parameter.
 
-Here is an overview of each script, in the sequence they should be run:
+Here is an overview of the scripts, in the sequence they should be run:
 
 ## Getting data
 
@@ -20,7 +20,7 @@ Data fetchers (in `src/fetchers`):
 - getRoads (get roads from OSM, as GeoJSON)
 - getBuildings (get buildings from OSM, as GeoJSON)
 
-The scripts can be run by going to the root folder of the repo and type `node src/fetchers/getTerrain.mjs config.json` and similar. To create the full model, run through all the scripts.
+Run the scripts by going to the root folder of the repo and type `node src/fetchers/getTerrain.mjs config.json` or similar. To create the full model, you will need to run through all the scripts in the list.
 
 ## Converting an elevation map to a triangle mesh
 
@@ -28,16 +28,16 @@ Mesh converters (in `src/converters`):
 
 - terrainToMesh (convert GeoTIFF height map to OBJ mesh)
 
-This script performs very simple mesh simplification - by subsamling the original height map and using only each `N` height value (in both X and Y directions) when creating the OBJ file. To run the script, you need to provide the skip value as input. Try with a value such as 10, ie `node src/converters/terrainToMesh.mjs 10 config.json`.
+This script performs very simple mesh simplification - by subsamling the original height map and using only each `N` height values (in both X and Y directions) when creating the OBJ file. To run the script, you need to provide the skip value as input. A good starting point can be 10, ie `node src/converters/terrainToMesh.mjs 10 config.json`.
 
-TODO: Conversion
+TODO: Conversion using GDAL
 
 # Clamping geometries onto terrain
 
 Geometry clamping (in `src/clampers`):
 
 - roadsOntoMesh (clamp GeoJSON line strings onto terrain surface)
-- buildingsOntoMesh (clamp GeoJSON outlines onto terrain surface, extrude up to building height and down to lowest terrain elevation for the outline)
+- buildingsOntoMesh (clamp GeoJSON outlines onto terrain surface, and extrude up to the building height and down to lowest terrain elevation for the outline)
 
 # Converting roads and buildings to meshes
 
@@ -48,18 +48,20 @@ Mesh converters (in `src/converters`):
 
 # Output
 
-The result from running the scripts should be three OBJ files - one each for terrain, buildings, and roads - and two PNG files (one for satellite imagery and one for aerial imagery).
+The scripts will generate various output files in the root directory of the repo. The important output is three OBJ files (one each for terrain, buildings, and roads) and two PNG files (one for satellite imagery and one for aerial imagery).
 
-## Presenting data
+## Visualization
 
-The visualization app is a simple webapp using three.js that will
+The visualization app is a simple webapp using three.js that will:
 
 - read the terrain mesh (OBJ)
-- read the satellite / ortho textures (PNG), and drape them onto the terrain
+- read the satellite / aerial images (PNG), and drape them onto the terrain
 - read the building geometries (OBJ) and add them to the scene
 - read the road geometries (OBJ) and add them to the scene
 
-To run the app, first copy the config file (`config.json`) and the output files from the preprocessing (5 files in total) to the `app/` folder, and then start the app using `yarn dev`.
+To run the app, first copy the output files from the preprocessing (5 files in total) and the config file (`config.json`) to the `app/` folder, and then start the app using `yarn dev`.
+
+You should now see a textured terrain model.
 
 ## App controls:
 
@@ -71,6 +73,4 @@ Press and hold the mouse button to move the camera, and use scroll to zoom in/ou
 - press 's' to view satellite imagery
 - press 'x' to export the scene to a GLB
 
-# Exporting data
-
-export three.js scene as gltf
+The GLB file will be stored in the default download folder for the browser. To view it, open a GLB viewer such as https://gltf-viewer.donmccurdy.com/ in your browser, and drag-and-drop the file there.
