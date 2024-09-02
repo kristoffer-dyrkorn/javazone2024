@@ -40,14 +40,14 @@ This script performs very simple mesh simplification - by subsamling the origina
 
 TODO: Conversion using GDAL
 
-# Clamping geometries onto terrain
+## Clamping geometries onto terrain
 
 Geometry clamping (in `src/clampers`):
 
 - roadsOntoMesh (clamp GeoJSON line strings onto terrain surface)
 - buildingsOntoMesh (clamp GeoJSON outlines onto terrain surface, and extrude up to the building height and down to lowest terrain elevation for the outline)
 
-# Converting roads and buildings to meshes
+## Converting roads and buildings to meshes
 
 Mesh converters (in `src/converters`):
 
