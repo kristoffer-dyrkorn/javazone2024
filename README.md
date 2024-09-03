@@ -2,7 +2,7 @@
 
 This repo contains an example implementation of the process flow discussed in my JavaZone 2024 talk "Building virtual worlds using open geodata". The code consists of two parts, written in plain JavaScript: Preprocessing scripts (for Node) and a simple web app (using three.js for data visualization).
 
-License: [Creative commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). In short, you are free to use the material, but not commercially. You must include attribution, and you must share derived material under this same license.
+License: [Creative commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). In short, you are free to reuse and adapt this material, but not commercially. You must include attribution, and you must share any derived material under this same license.
 
 ## Example output
 
@@ -30,6 +30,12 @@ Data fetchers (in `src/fetchers`):
 
 Run the scripts by going to the root folder of the repo and type `node src/fetchers/getTerrain.mjs config.json` or similar. To create the full model, you will need to run through all the scripts in the list.
 
+NOTE: The GeoTIFF flavor that the example data source provides is unfortunately not compatible with the JavaScript library used to parse GeoTIFFs in the next step. So you will have to re-encode the downloaded GeoTIFF using the command-line tool `gdal_translate` - part of [GDAL](https://www.gdal.org/). The commands you need to issue before moving to the next step, are:
+
+- `gdal_translate world-terrain.tiff world-terrain-fixed.tiff`
+- `rm world-terrain.tiff`
+- `mv world-terrain-fixed.tiff world-terrain.tiff`
+
 ## Converting an elevation map to a triangle mesh
 
 Mesh converters (in `src/converters`):
@@ -37,8 +43,6 @@ Mesh converters (in `src/converters`):
 - terrainToMesh (convert GeoTIFF height map to OBJ mesh)
 
 This script performs very simple mesh simplification - by subsamling the original height map and using only each `N` height values (in both X and Y directions) when creating the OBJ file. To run the script, you need to provide the skip value as input. A good starting point can be 10, ie `node src/converters/terrainToMesh.mjs 10 config.json`.
-
-TODO: Conversion using GDAL
 
 ## Clamping geometries onto terrain
 
