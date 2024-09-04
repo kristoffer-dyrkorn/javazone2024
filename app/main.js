@@ -144,6 +144,9 @@ window.addEventListener("keydown", (keyboardEvent) => {
     case "s":
       terrainMesh.material.map = satelliteTexture
       break
+    case "w":
+      terrainMesh.material.wireframe = !terrainMesh.material.wireframe
+      break
     case "x":
       exportScene(scene, "scene.glb")
       break
