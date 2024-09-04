@@ -28,11 +28,11 @@ Data fetchers (in `src/fetchers`):
 - getRoads (get roads from OSM, as GeoJSON)
 - getBuildings (get buildings from OSM, as GeoJSON)
 
-Run the scripts by going to the root folder of the repo and type `node src/fetchers/getTerrain.mjs config.json` or similar. To create the full model, you will need to run through all the scripts in the list.
+Run the scripts by going to the root folder of the repo and type `node src/fetchers/getTerrain.mjs config.json` and similar. To create the full model, you will need to run through all the scripts in this list.
 
-Please note that this example data source for aerial photos does not permit commercial usage of the images. In general, make sure you know the licences for your data sets before using them.
+Please note that the example data source for aerial photos used here does not permit commercial usage of the images. In general, make sure you know the licence terms for your data sets before using them.
 
-NOTE: The GeoTIFF flavor that the example data source provides is unfortunately not compatible with the JavaScript library used to parse GeoTIFFs in the next step. So you will have to re-encode the downloaded GeoTIFF using the command-line tool `gdal_translate` - part of [GDAL](https://www.gdal.org/). The commands you need to issue before moving to the next step, are:
+The example source for the terrain data produces a type of GeoTIFF that is unfortunately not compatible with the JavaScript library used to parse GeoTIFFs in the following step. So you will have to re-encode the downloaded GeoTIFF using the command-line tool `gdal_translate` - part of [GDAL](https://www.gdal.org/). The commands you need to issue before going to the next step, are:
 
 - `gdal_translate world-terrain.tiff world-terrain-fixed.tiff`
 - `rm world-terrain.tiff`
@@ -44,7 +44,9 @@ Mesh converters (in `src/converters`):
 
 - terrainToMesh (convert GeoTIFF height map to OBJ mesh)
 
-This script performs very simple mesh simplification - by subsamling the original height map and using only each `N` height values (in both X and Y directions) when creating the OBJ file. To run the script, you need to provide the skip value as input. A good starting point can be 10, ie `node src/converters/terrainToMesh.mjs 10 config.json`.
+This script performs very simple mesh simplification - by subsamling the original height map and skipping height values so that only each `N` value (in both X and Y directions) are used when creating the OBJ file. This is useful to avoid overly detailed meshes. A more sophisticated mesh simplification algorithm is highly recommended for general use.
+
+To run the `terrainToMesh` script, you need to provide the skip count as input. A good starting point can be 10, meaning that only every 10th height value is used. That means the output mesh will have 10 meter resolution instead of matching the source data's 1 meter resolution. This skip value will reduce the total triangle count by a factor of 100. The command would be: `node src/converters/terrainToMesh.mjs 10 config.json`.
 
 ## Clamping geometries onto terrain
 
@@ -58,11 +60,11 @@ Geometry clamping (in `src/clampers`):
 Mesh converters (in `src/converters`):
 
 - roadsToMesh (convert clamped roads to OBJ mesh)
-- buildingsToMesh (convert clamped buildings to OBJ mesh)
+- buildingsToMesh (convert clamped and extruded buildings to OBJ mesh)
 
 # Output
 
-The scripts will generate various output files in the root directory of the repo. The important output is three OBJ files (one each for terrain, buildings, and roads) and two PNG files (one for satellite imagery and one for aerial imagery).
+The scripts will generate various output files in the root directory for the repo. The important output is three OBJ files (one each for terrain, buildings, and roads) and two PNG files (one for satellite imagery and one for aerial imagery).
 
 ## Visualization
 
@@ -86,5 +88,6 @@ Press and hold the mouse button to move the camera, and use scroll to zoom in/ou
 - press 'o' to view orthophoto (aerial imagery)
 - press 's' to view satellite imagery
 - press 'x' to export the scene to a GLB
+- press 'w' to toggle viewframe display of the terrain
 
 The GLB file will be stored in the default download folder for the browser. To view it, open a GLB viewer such as https://gltf-viewer.donmccurdy.com/ in your browser, and drag-and-drop the file there.
