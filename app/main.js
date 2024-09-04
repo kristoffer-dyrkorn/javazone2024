@@ -35,6 +35,7 @@ orthoTexture.colorSpace = THREE.SRGBColorSpace
 let terrainMesh
 let buildingMesh
 let roadMesh
+let attributionText = ""
 
 const objLoader = new OBJLoader()
 objLoader.load(
@@ -43,6 +44,8 @@ objLoader.load(
     terrainMesh = object.children[0]
     terrainMesh.material.map = satelliteTexture
     scene.add(terrainMesh)
+
+    updateAttributions()
   },
   () => {},
   (error) => {
@@ -103,6 +106,7 @@ window.addEventListener("keydown", (keyboardEvent) => {
           (object) => {
             buildingMesh = object.children[0]
             scene.add(buildingMesh)
+            updateAttributions()
           },
           () => {},
           (error) => {
@@ -111,6 +115,7 @@ window.addEventListener("keydown", (keyboardEvent) => {
         )
       } else {
         buildingMesh.visible = !buildingMesh.visible
+        updateAttributions()
       }
       break
     case "r":
@@ -121,6 +126,7 @@ window.addEventListener("keydown", (keyboardEvent) => {
             roadMesh = object.children[0]
             roadMesh.material.color.set(0x222222)
             scene.add(roadMesh)
+            updateAttributions()
           },
           () => {},
           (error) => {
@@ -129,6 +135,7 @@ window.addEventListener("keydown", (keyboardEvent) => {
         )
       } else {
         roadMesh.visible = !roadMesh.visible
+        updateAttributions()
       }
       break
     case "o":
@@ -141,7 +148,17 @@ window.addEventListener("keydown", (keyboardEvent) => {
       exportScene(scene, "scene.glb")
       break
   }
+  updateAttributions()
 })
+
+function updateAttributions() {
+  attributionText = ""
+  if (terrainMesh || terrainMesh.material.map == orthoTexture) attributionText += "© Kartverket"
+  if ((buildingMesh && buildingMesh.visible) || (roadMesh && roadMesh.visible)) attributionText += " © OpenStreetMap"
+  if (terrainMesh.material.map == satelliteTexture) attributionText += " © Copernicus Sentinel-2"
+
+  document.getElementById("attribution").innerText = attributionText
+}
 
 function animate() {
   renderer.render(scene, camera)
