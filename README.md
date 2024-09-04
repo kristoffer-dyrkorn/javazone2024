@@ -30,6 +30,8 @@ Data fetchers (in `src/fetchers`):
 
 Run the scripts by going to the root folder of the repo and type `node src/fetchers/getTerrain.mjs config.json` or similar. To create the full model, you will need to run through all the scripts in the list.
 
+Please note that this example data source for aerial photos does not permit commercial usage of the images. In general, make sure you know the licences for your data sets before using them.
+
 NOTE: The GeoTIFF flavor that the example data source provides is unfortunately not compatible with the JavaScript library used to parse GeoTIFFs in the next step. So you will have to re-encode the downloaded GeoTIFF using the command-line tool `gdal_translate` - part of [GDAL](https://www.gdal.org/). The commands you need to issue before moving to the next step, are:
 
 - `gdal_translate world-terrain.tiff world-terrain-fixed.tiff`
