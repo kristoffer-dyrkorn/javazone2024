@@ -5,9 +5,9 @@
     "dev": "vite"
   },
   "dependencies": {
-    "three": "^0.166.1"
+    "three": "^0.166.1",
+    "vite": "^5.3.4"
   },
   "devDependencies": {
-    "vite": "^5.3.4"
   }
 }
