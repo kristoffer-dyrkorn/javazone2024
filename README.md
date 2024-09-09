@@ -75,7 +75,12 @@ The visualization app is a simple webapp using three.js that will:
 - read the building geometries (OBJ) and add them to the scene
 - read the road geometries (OBJ) and add them to the scene
 
-Before you run the app, **make sure you first copy the output files from the preprocessing** (5 files in total) and the config file (`config.json`) to the `app/` folder, and **then** start the app using `yarn dev`.
+Before you run the app, **make sure you first copy the output files from the preprocessing** (5 files in total) and the config file (`config.json`) to the `app/` folder.
+
+Then go to the `app/` folder and type:
+
+- `yarn` to install all dependencies, and then
+- `yarn dev` to start the web app
 
 You should now see a textured terrain model.
 
